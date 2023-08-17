@@ -3,9 +3,8 @@ using Unit32.WebApplicationMVC.Models;
 
 namespace Unit32.WebApplicationMVC.DL
 {
-    public interface IBlogRepository
+    public interface IRequest
     {
-        Task AddUser(User user);
-        Task<User[]> GetUsers();
+        Task AddRequest(Request request);
     }
 }

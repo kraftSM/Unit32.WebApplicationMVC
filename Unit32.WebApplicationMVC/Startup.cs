@@ -31,12 +31,16 @@ namespace Unit32.WebApplicationMVC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            string connection = _configuration.GetConnectionString("ConnectionStrings");
+            // Присоединяем контест БД
+            string connection = _configuration.GetConnectionString("DefaultConnection");
             services.AddDbContext<BlogContext>(options => options.UseSqlServer(connection), ServiceLifetime.Singleton);
+            //services.AddDbContext<BlogContext>(options => options.UseSqlServer(connection));
             //services.AddSingleton<ILoggingRepository, LoggingRepository>();
-            services.AddDbContext<BlogContext>(options => options.UseSqlServer(connection));
-            // регистрация сервиса репозитория для взаимодействия с базой данных
+
+            // регистрация сервисы репозиториев для взаимодействия с базой данных
+            //service for Blogs
             services.AddSingleton<IBlogRepository, BlogRepository>();
+
             services.AddControllersWithViews();
         }
 
