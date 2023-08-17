@@ -13,7 +13,8 @@ namespace Unit32.WebApplicationMVC.Models
 
         // Ссылка на таблицу UserPosts - сообщения пользователей
         public DbSet<UserPost> UserPosts { get; set; }
-
+        // Ссылка на таблицу UserPosts - сообщения пользователей
+        public DbSet<Request>  Request { get; set; }
         // Логика взаимодействия с таблицами в БД - (операции сконтекстом БД при создании приложения)
         public BlogContext(DbContextOptions<BlogContext> options) : base(options)
         {
