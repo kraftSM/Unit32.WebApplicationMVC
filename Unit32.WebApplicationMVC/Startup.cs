@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Unit32.WebApplicationMVC.DL;
+using Unit32.WebApplicationMVC.Middlewares;
 using Unit32.WebApplicationMVC.Models;
 
 namespace Unit32.WebApplicationMVC
@@ -53,6 +54,7 @@ namespace Unit32.WebApplicationMVC
             app.UseStaticFiles();
 
             app.UseRouting();
+            app.UseMiddleware<LoggingMiddleware>();
 
             app.UseAuthorization();
 
