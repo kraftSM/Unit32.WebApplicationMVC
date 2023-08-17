@@ -24,9 +24,7 @@ namespace Unit32.WebApplicationMVC
         {
             _env =env;
             _configuration = configuration;
-        }
-
-       
+        }       
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -40,6 +38,7 @@ namespace Unit32.WebApplicationMVC
             // регистрация сервисы репозиториев для взаимодействия с базой данных
             //service for Blogs
             services.AddSingleton<IBlogRepository, BlogRepository>();
+            services.AddSingleton<IRequestRepository, RequestRepository>();
 
             services.AddControllersWithViews();
         }
@@ -56,6 +55,7 @@ namespace Unit32.WebApplicationMVC
                 app.UseExceptionHandler("/Home/Error");
             }
             app.UseStaticFiles();
+            //app.UseMiddleware<LoggingMiddleware>();
 
             app.UseRouting();
             app.UseMiddleware<LoggingMiddleware>();

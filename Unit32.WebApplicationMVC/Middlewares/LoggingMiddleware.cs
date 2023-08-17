@@ -2,66 +2,84 @@
 using System.Threading.Tasks;
 using System;
 using System.IO;
-using Unit32.WebApplicationMVC.DL;
 using Unit32.WebApplicationMVC.Models;
+using Unit32.WebApplicationMVC.DL;
+using System.Text;
 
 namespace Unit32.WebApplicationMVC.Middlewares
 {
     public class LoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IBlogRepository _repo;
+        private readonly IRequestRepository _repo;
+        private readonly bool _logFileNameIsConst = true;//true
+        private  bool _logFileNameIsBuilded = false;
+        private string _logFileName;
+        // Строка для публикации в лог
 
         /// <summary>
         ///  Middleware-компонент должен иметь конструктор, принимающий RequestDelegate
         /// </summary>
-        public LoggingMiddleware(RequestDelegate next, IBlogRepository repo)
+        public LoggingMiddleware(RequestDelegate next, IRequestRepository repo)
         {
             _next = next;
             _repo = repo;
+            if (_logFileNameIsConst) _logFileName = "RequestLog.txt";
+            else _logFileName = "RequestLog[].txt"; 
+
         }
-        private void LogConsole(HttpContext context)
+        private void LogConsole(string logDT, string logURL)
         {
-            // Для логирования данных о запросе используем свойста объекта HttpContext
-            Console.WriteLine($"[{DateTime.Now}]: New request to http://{context.Request.Host.Value + context.Request.Path}");
+            Console.WriteLine($"[{logDT}]: New request to {logURL}");
+        }
+        private void buildLogFileName()
+        {
+            StringBuilder logFileName0 = new StringBuilder();
+            logFileName0.Append(_logFileName);
+            string fileTimeMark =DateTime.Now.ToString("yyyyMMdd_HHmm");
+            logFileName0.Replace("[]", fileTimeMark);
+            _logFileName = logFileName0.ToString();
+
+            _logFileNameIsBuilded = true;
+            Console.WriteLine($" Log File Name is {_logFileName}");
         }
 
-        private async Task LogFile(HttpContext context)
+        private async Task LogFile(string logDT, string logURL )
         {
-            string logFileName = "RequestLog.txt";
-            //string logFileName = "RequestLog"+DateTime.Now.ToString("yyyyMMdd_HHmm")+ ".txt";
-            // Строка для публикации в лог
-            string logMessage = $"[{DateTime.Now}]: New request to http://{context.Request.Host.Value + context.Request.Path}{Environment.NewLine}";
+            if (!_logFileNameIsConst && !_logFileNameIsBuilded)  buildLogFileName();
+
+            string logMessage = $"[{logDT}]: New request to {logURL}{Environment.NewLine}";
 
             // Путь до лога (опять-таки, используем свойства IWebHostEnvironment)
-            string logFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Logs", logFileName);
+            string logFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Logs", "RequestLog.txt");
 
             // Используем асинхронную запись в файл
             await File.AppendAllTextAsync(logFilePath, logMessage);
+        }
+      
+        private async Task LogDb(DateTime logDate, String logUrl)
+        {
+            var request = new Request()
+            {
+                //Id = Guid.NewGuid(),
+                Date = logDate,
+                Url = logUrl
+            };
+
+            await _repo.AddRequest(request);
         }
         /// <summary>
         ///  Необходимо реализовать метод Invoke  или InvokeAsync
         /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
-            //// Добавим создание нового пользователя
-            //var newUser = new User()
-            //{
-            //    Id = Guid.NewGuid(),
-            //    FirstName = "Andrey",
-            //    LastName = "Petrov",
-            //    JoinDate = DateTime.Now
-            //};
+            string logUrlAdress = $"http://{context.Request.Host.Value + context.Request.Path}";
+            DateTime logTimeMark = DateTime.Now;
 
-            //// Добавим в базу
-            //await _repo.AddUser(newUser);
-            // Выведем результат
-            //Console.WriteLine($"User with id {newUser.Id}, named {newUser.FirstName} was successfully added on {newUser.JoinDate}");
-
-            // Для логирования данных о запросе используем свойста объекта HttpContext
-            //Console.WriteLine($"[{DateTime.Now}]: New request to http://{context.Request.Host.Value + context.Request.Path}");
-            LogConsole(context);
-            await LogFile(context);
+            LogConsole(logTimeMark.ToString(), logUrlAdress);
+            //await LogFile(logTimeMark.ToString(), logUrlAdress); // запись в logFile отключена
+            await LogDb(logTimeMark, logUrlAdress);
+            
             // Передача запроса далее по конвейеру
             await _next.Invoke(context);
         }

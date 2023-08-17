@@ -20,12 +20,14 @@ namespace Unit32.WebApplicationMVC.Controllers
             //return View(authors);
             return View(users);
         }
-        [HttpGet]
+
+        [HttpGet]        
         
         public IActionResult Register()
         {
         return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> Register(User newUser)
         {

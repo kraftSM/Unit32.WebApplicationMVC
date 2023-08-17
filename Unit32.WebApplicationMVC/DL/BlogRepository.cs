@@ -17,7 +17,6 @@ namespace Unit32.WebApplicationMVC.DL
         }
         public async Task<User[]> GetUsers()
         {
-            // Получим всех активных пользователей
             return await _context.Users.ToArrayAsync();
         }
         public async Task AddUser(User user)
@@ -46,5 +45,6 @@ namespace Unit32.WebApplicationMVC.DL
             // Сохранение изенений
             await _context.SaveChangesAsync();
         }
+        
     }
 }
