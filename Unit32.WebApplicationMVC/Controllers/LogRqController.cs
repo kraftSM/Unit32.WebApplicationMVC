@@ -17,9 +17,9 @@ namespace Unit32.WebApplicationMVC.Controllers
         // Сделаем метод асинхронным
         public async Task<IActionResult> Index()
         {
-            var requests = await _repo.GetRequest();
-            return View(requests);
-            //return View();
+            //var requests = await _repo.GetRequest();
+            //return View(requests);
+            return View();
 
         }
     }
